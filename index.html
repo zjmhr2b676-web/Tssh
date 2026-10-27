@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>體育班資料統計</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            indigo: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' },
+            emerald: { 50: '#ecfdf5', 500: '#10b981', 600: '#059669' },
+            amber: { 50: '#fffbeb', 500: '#f59e0b', 600: '#d97706' },
+            slate: { 50: '#f8fafc', 800: '#1e293b', 900: '#0f172a' }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Marked.js for Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    body { font-family: '微軟正黑體', 'Microsoft JhengHei', sans-serif; }
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    #custom-toast { display: none; z-index: 100; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+
+  <!-- Custom Toast Notification -->
+  <div id="custom-toast" class="fixed top-5 right-5 px-6 py-3 rounded-xl shadow-lg text-white font-medium transition-all duration-300 flex items-center gap-3">
+    <i id="toast-icon" class="fa-solid fa-circle-info"></i>
+    <span id="toast-message">Message</span>
+  </div>
+
+  <!-- Admin Login Quick Modal (for switching inside app) -->
+  <div id="admin-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100 relative animate-fadeIn">
+      <button id="btn-close-admin-modal" type="button" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full mb-3 text-xl">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900">驗證管理員權限</h3>
+        <p class="text-xs text-slate-500 mt-1">請登入管理員 Email 或使用授權 Google 帳號解鎖編輯功能</p>
+      </div>
+      <form id="modal-admin-login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">管理員 Email</label>
+          <input id="modal-login-email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">密碼</label>
+          <input id="modal-login-password" type="password" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+        <button type="submit" id="btn-modal-email-login" class="w-full py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition shadow">
+          <i class="fa-solid fa-key mr-1.5"></i> 管理員登入
+        </button>
+      </form>
+      <div class="relative my-4">
+        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+        <div class="relative flex justify-center text-xs"><span class="bg-white px-2 text-slate-400">或</span></div>
+      </div>
+      <button id="btn-modal-google-login" type="button" class="w-full flex justify-center items-center py-2 px-4 border border-slate-300 rounded-lg text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition">
+        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Google 管理員授權登入
+      </button>
+    </div>
+  </div>
+
+  <!-- Email Register Modal -->
+  <div id="register-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100 relative animate-fadeIn">
+      <button id="btn-close-register-modal" type="button" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="text-center mb-5">
+        <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full mb-2 text-xl">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900">註冊系統帳號</h3>
+        <p class="text-xs text-slate-500 mt-1">註冊後將依據「管理員授權名單」自動核給相對應權限</p>
+      </div>
+      <form id="register-form" class="space-y-3">
+        <div class="p-2.5 bg-indigo-50 border border-indigo-100 rounded-lg text-xs text-indigo-700">
+          <i class="fa-solid fa-shield-cat mr-1"></i> 提示：僅有經現有管理員於後台授權之 Email 具備編輯權限，其餘帳號預設為唯讀訪客模式。
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Email 信箱</label>
+          <input id="register-email" type="email" required class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="user@school.edu.tw">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">密碼 (至少 6 位數)</label>
+          <input id="register-password" type="password" required minlength="6" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="••••••••">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">確認密碼</label>
+          <input id="register-password-confirm" type="password" required minlength="6" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="••••••••">
+        </div>
+        <button type="submit" id="btn-submit-register" class="w-full py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition shadow mt-2">
+          <i class="fa-solid fa-user-check mr-1.5"></i> 完成註冊並自動登入
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-6 bg-white p-8 rounded-2xl shadow-xl border border-slate-100">
+      <div class="text-center">
+        <div class="text-5xl mb-3">🔮</div>
+        <h2 class="text-2xl font-extrabold text-slate-900">體育班資料統計系統</h2>
+        <p class="text-xs text-slate-500 mt-1">雲端一站式評鑑資料彙整平台</p>
+      </div>
+      
+      <!-- Login Type Switcher Tabs -->
+      <div class="flex border-b border-slate-200">
+        <button id="login-tab-admin" type="button" class="flex-1 py-2.5 text-center text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
+          <i class="fa-solid fa-shield-halved mr-1.5"></i>管理員登入
+        </button>
+        <button id="login-tab-guest" type="button" class="flex-1 py-2.5 text-center text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
+          <i class="fa-solid fa-eye mr-1.5"></i>評鑑委員 / 訪客
+        </button>
+      </div>
+
+      <!-- Panel A: Admin Form -->
+      <div id="panel-admin" class="space-y-5">
+        <form id="email-login-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">管理員 Email</label>
+            <input id="login-email" type="email" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="admin@school.edu.tw">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">密碼</label>
+            <input id="login-password" type="password" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
+          </div>
+          <button type="submit" id="btn-email-login" class="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition shadow">
+            <i class="fa-solid fa-right-to-bracket mr-2"></i> 管理員 Email 登入
+          </button>
+        </form>
+
+        <div class="text-center pt-0.5">
+          <button id="btn-open-register-admin" type="button" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline inline-flex items-center gap-1">
+            <i class="fa-solid fa-user-plus"></i> 還沒有帳號？註冊新管理員帳號
+          </button>
+        </div>
+
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+          <div class="relative flex justify-center text-xs"><span class="bg-white px-2 text-slate-400">快速驗證</span></div>
+        </div>
+
+        <button id="btn-google-login" type="button" class="w-full flex justify-center items-center py-2.5 px-4 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition">
+          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google 帳號登入 (管理員)
+        </button>
+      </div>
+
+      <!-- Panel B: Guest Panel -->
+      <div id="panel-guest" class="hidden space-y-4 py-2">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-left space-y-1 mb-2">
+          <div class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info text-indigo-500"></i> 評鑑委員 / 訪客模式
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            訪客模式可完整調閱學生常模、課表、獎狀與 AI 評鑑報告，僅限唯讀檢視。
+          </p>
+        </div>
+
+        <!-- Option 1: Guest Email Login Form -->
+        <form id="guest-email-login-form" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">訪客 Email</label>
+            <input id="guest-login-email" type="email" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="visitor@school.edu.tw">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">密碼</label>
+            <input id="guest-login-password" type="password" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
+          </div>
+          <button type="submit" id="btn-guest-email-login" class="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-slate-700 hover:bg-slate-800 transition shadow">
+            <i class="fa-solid fa-right-to-bracket mr-2"></i> 訪客 Email 登入
+          </button>
+        </form>
+
+        <div class="text-center pt-0.5">
+          <button id="btn-open-register-guest" type="button" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline inline-flex items-center gap-1">
+            <i class="fa-solid fa-user-plus"></i> 還沒有帳號？註冊新訪客帳號
+          </button>
+        </div>
+
+        <div class="relative my-3">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+          <div class="relative flex justify-center text-xs"><span class="bg-white px-2 text-slate-400">其他訪客登入方式</span></div>
+        </div>
+
+        <!-- Option 2: Guest Google Login Button -->
+        <button id="btn-guest-google-login" type="button" class="w-full flex justify-center items-center py-2.5 px-4 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition">
+          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Google 帳號登入 (訪客)
+        </button>
+
+        <!-- Option 3: Anonymous Login Button -->
+        <button id="btn-anon-login" type="button" class="w-full flex justify-center items-center py-2.5 px-4 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition">
+          <i class="fa-solid fa-user-secret mr-2"></i> 免帳號快速進入 (匿名訪客)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP SCREEN ================= -->
+  <div id="app-container" class="hidden flex-grow flex flex-col">
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
+        <div class="flex items-center gap-3">
+          <div class="text-2xl">🔮</div>
+          <div>
+            <h1 class="text-lg font-bold text-slate-900 leading-tight">體育班資料統計</h1>
+            <span id="role-badge" class="inline-flex items-center text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+              載入權限中...
+            </span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="btn-switch-to-admin" type="button" class="hidden text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg border border-indigo-200 transition">
+            <i class="fa-solid fa-key mr-1"></i> 切換為管理員登入
+          </button>
+          <span class="text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg hidden sm:flex items-center gap-2">
+            <i class="fa-solid fa-user text-indigo-500"></i>
+            <span id="user-display">載入中...</span>
+          </span>
+          <button id="btn-logout" type="button" class="text-xs font-semibold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg transition border border-red-100">
+            登出 <i class="fa-solid fa-arrow-right-from-bracket ml-1"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Navigation Tabs -->
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 overflow-x-auto pb-2">
+        <button class="nav-tab active px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-2 bg-indigo-600 text-white shadow-sm" data-target="tab-students">
+          <i class="fa-solid fa-users"></i> 學生與體能
+        </button>
+        <button class="nav-tab px-4 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-100 flex items-center gap-2" data-target="tab-schedules">
+          <i class="fa-regular fa-calendar-days"></i> 專項課表
+        </button>
+        <button class="nav-tab px-4 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-100 flex items-center gap-2" data-target="tab-competitions">
+          <i class="fa-solid fa-trophy"></i> 比賽紀錄
+        </button>
+        <button class="nav-tab px-4 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-100 flex items-center gap-2" data-target="tab-advocacy">
+          <i class="fa-solid fa-bullhorn"></i> 法定宣導
+        </button>
+        <button class="nav-tab px-4 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-100 flex items-center gap-2" data-target="tab-ai">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> AI 評鑑報告
+        </button>
+        <button id="nav-tab-admin-manage" class="nav-tab hidden px-4 py-2 rounded-xl text-sm font-medium transition text-slate-600 hover:bg-slate-100 flex items-center gap-2" data-target="tab-admin-manage">
+          <i class="fa-solid fa-user-gear text-indigo-500"></i> 管理員名單
+        </button>
+      </nav>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      
+      <!-- TAB 1: 學生與體能 -->
+      <section id="tab-students" class="tab-content active space-y-6">
+        <div class="admin-only-card bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4 flex items-center justify-between">
+            <span><i class="fa-solid fa-user-plus text-indigo-600 mr-2"></i>新增學生資料</span>
+            <span class="guest-hide text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold"><i class="fa-solid fa-lock-open mr-1"></i>管理員可編輯</span>
+          </h2>
+          <form id="form-student" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">姓名</label><input id="st-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">專項運動</label><input id="st-sport" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">畢業國中</label><input id="st-school" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">身高 (cm)</label><input id="st-height" type="number" step="0.1" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">體重 (kg)</label><input id="st-weight" type="number" step="0.1" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">立定跳遠 (cm)</label><input id="st-jump" type="number" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">坐姿體前彎 (cm)</label><input id="st-sit" type="number" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">長跑距離與時間</label><input id="st-run" type="text" placeholder="例: 1600m / 360秒" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div class="flex items-end"><button type="submit" class="btn-admin-submit w-full bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold shadow hover:bg-indigo-700 transition">新增至資料庫</button></div>
+          </form>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-x-auto">
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 font-semibold">姓名</th>
+                <th class="px-4 py-3 font-semibold">專項</th>
+                <th class="px-4 py-3 font-semibold">身高/體重</th>
+                <th class="px-4 py-3 font-semibold">畢業國中</th>
+                <th class="px-4 py-3 font-semibold">體能紀錄</th>
+              </tr>
+            </thead>
+            <tbody id="list-students" class="divide-y divide-slate-100">
+              <tr><td colspan="5" class="text-center py-4 text-slate-400">載入中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 2: 專項課表 -->
+      <section id="tab-schedules" class="tab-content space-y-6">
+        <div class="admin-only-card bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4"><i class="fa-regular fa-calendar-days text-indigo-600 mr-2"></i>上傳專項課表</h2>
+          <form id="form-schedule" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">學年度</label><input id="sc-year" type="text" placeholder="113" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">年級/班級</label><input id="sc-grade" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">學期</label>
+              <select id="sc-semester" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500 bg-white">
+                <option value="上學期">上學期</option><option value="下學期">下學期</option>
+              </select>
+            </div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">備註/重點</label><input id="sc-notes" type="text" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
+            <div class="col-span-full">
+              <label class="block text-xs font-semibold text-slate-600 mb-1">課表圖檔上傳</label>
+              <input id="sc-file" type="file" accept="image/*" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+            </div>
+            <div class="col-span-full flex justify-end">
+              <button type="submit" id="btn-submit-sc" class="btn-admin-submit bg-indigo-600 text-white rounded-lg px-6 py-2 text-sm font-semibold shadow hover:bg-indigo-700 transition">上傳並儲存</button>
+            </div>
+          </form>
+        </div>
+        <div id="list-schedules" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Schedules Grid injected here -->
+        </div>
+      </section>
+
+      <!-- TAB 3: 比賽紀錄 -->
+      <section id="tab-competitions" class="tab-content space-y-6">
+        <div class="admin-only-card bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>登錄比賽紀錄</h2>
+          <form id="form-competition" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">賽事名稱</label><input id="cp-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-amber-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">競賽日期</label><input id="cp-date" type="date" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-amber-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">參賽項目</label><input id="cp-category" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-amber-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">獲獎學生姓名</label><input id="cp-student" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-amber-500"></div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">獲得名次</label><input id="cp-ranking" type="text" required placeholder="例如：第一名 (金牌)" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-amber-500"></div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">獎狀/佐證照片</label>
+              <input id="cp-file" type="file" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+            </div>
+            <div class="col-span-full flex justify-end">
+              <button type="submit" id="btn-submit-cp" class="btn-admin-submit bg-amber-500 text-white rounded-lg px-6 py-2 text-sm font-semibold shadow hover:bg-amber-600 transition">新增紀錄</button>
+            </div>
+          </form>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <ul id="list-competitions" class="divide-y divide-slate-100">
+            <!-- Competitions injected here -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 4: 法定宣導 -->
+      <section id="tab-advocacy" class="tab-content space-y-6">
+        <div class="admin-only-card bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4"><i class="fa-solid fa-bullhorn text-emerald-500 mr-2"></i>新增法定宣導成果</h2>
+          <form id="form-advocacy" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">宣導類別</label>
+              <select id="ad-type" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-emerald-500 bg-white">
+                <option value="anti_drug">反毒宣導</option>
+                <option value="anti_bullying">反霸凌宣導</option>
+                <option value="gender_equity">性別平等教育</option>
+              </select>
+            </div>
+            <div><label class="block text-xs font-semibold text-slate-600 mb-1">活動日期</label><input id="ad-date" type="date" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-emerald-500"></div>
+            <div class="col-span-full"><label class="block text-xs font-semibold text-slate-600 mb-1">活動主題/標題</label><input id="ad-title" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-emerald-500"></div>
+            <div class="col-span-full"><label class="block text-xs font-semibold text-slate-600 mb-1">成果摘要</label><textarea id="ad-summary" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-emerald-500 h-20"></textarea></div>
+            <div class="col-span-full">
+              <label class="block text-xs font-semibold text-slate-600 mb-1">現場照片 (必備佐證)</label>
+              <input id="ad-file" type="file" accept="image/*" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+            </div>
+            <div class="col-span-full flex justify-end">
+              <button type="submit" id="btn-submit-ad" class="btn-admin-submit bg-emerald-500 text-white rounded-lg px-6 py-2 text-sm font-semibold shadow hover:bg-emerald-600 transition">上傳成果</button>
+            </div>
+          </form>
+        </div>
+        <div id="list-advocacy" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Advocacy injected here -->
+        </div>
+      </section>
+
+      <!-- TAB 5: AI 評鑑報告 -->
+      <section id="tab-ai" class="tab-content space-y-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-800"><i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-2"></i>AI 輔助評鑑報告生成</h2>
+              <p class="text-sm text-slate-500 mt-1">匯聚各項系統資料，自動化產出高語意純度的自評報告。</p>
+            </div>
+            <div class="flex flex-col gap-2 min-w-[300px]">
+              <input id="gemini-key" type="password" placeholder="Gemini API Key (選填，Canvas 自動注入)" class="border rounded-lg px-3 py-2 text-sm w-full focus:ring-1 focus:ring-indigo-500">
+              <button id="btn-generate-ai" type="button" class="bg-indigo-600 text-white rounded-lg px-6 py-3 text-sm font-bold shadow hover:bg-indigo-700 transition flex justify-center items-center gap-2 w-full">
+                <i class="fa-solid fa-robot"></i> 生成 AI 評鑑報告
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div id="ai-loading" class="hidden text-center py-12">
+          <i class="fa-solid fa-circle-notch fa-spin text-4xl text-indigo-500 mb-4"></i>
+          <p class="text-slate-600 font-medium">正在讀取資料庫並調用 AI 模型撰寫報告...</p>
+        </div>
+
+        <div id="ai-output-container" class="hidden bg-white p-8 rounded-xl shadow-sm border border-slate-200 prose prose-indigo max-w-none prose-sm sm:prose-base">
+          <!-- AI Content injected here -->
+        </div>
+      </section>
+
+      <!-- TAB 6: 管理員名單設定 (僅限管理員可見) -->
+      <section id="tab-admin-manage" class="tab-content space-y-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+          <div class="border-b pb-4 mb-4">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-user-shield text-indigo-600"></i> 管理員權限名單設定
+            </h2>
+            <p class="text-xs text-slate-500 mt-1">新增至此名單的 Email 帳號（不論透過 Google 授權或 Email 註冊登入）將自動具備完整的後台編輯權限。</p>
+          </div>
+
+          <form id="form-add-admin-email" class="flex flex-col sm:flex-row gap-3 mb-6">
+            <input id="input-new-admin-email" type="email" required placeholder="輸入欲授權之 Email 信箱 (例: teacher@school.edu.tw)" class="flex-grow border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <button type="submit" id="btn-add-admin-email" class="bg-indigo-600 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow hover:bg-indigo-700 transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-plus"></i> 新增授權 Email
+            </button>
+          </form>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm whitespace-nowrap">
+              <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
+                <tr>
+                  <th class="px-4 py-3 font-semibold">授權管理員 Email</th>
+                  <th class="px-4 py-3 font-semibold">加入時間 / 註記</th>
+                  <th class="px-4 py-3 font-semibold text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody id="list-admin-emails" class="divide-y divide-slate-100">
+                <tr><td colspan="3" class="text-center py-4 text-slate-400">載入名單中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 mt-auto">
+      <div class="max-w-7xl mx-auto px-4 text-center">
+        <p class="text-sm text-slate-500">© 2020 TonyStudio (TONY 楊文澤顧問). All rights reserved. | 創作者：小戚老師</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- JavaScript App Logic -->
+  <script type="module">
+    // Using Firebase v11.6.1 CDN modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { 
+      getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, 
+      signInAnonymously, onAuthStateChanged, signOut 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { 
+      getStorage, ref, uploadBytes, getDownloadURL 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCbSqoW9GpOyaXbdGrSPgzI1cjdjsu4kvA',
+      authDomain: 'tssh01-7c713.firebaseapp.com',
+      projectId: 'tssh01-7c713',
+      storageBucket: 'tssh01-7c713.firebasestorage.app',
+      messagingSenderId: '951578332380',
+      appId: '1:951578332380:web:360c0f2052566b08473819',
+      measurementId: 'G-EW01ZB5SJ4'
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // Data strict paths constraint
+    const appIdStr = 'tssh01_sports';
+    const getPath = (colName) => `artifacts/${appIdStr}/public/data/${colName}`;
+
+    // Global Data State & Auth State
+    let appData = { students: [], schedules: [], competitions: [], advocacy: [], adminRoles: [] };
+    let unsubscribes = [];
+    let isCurrentAdmin = false;
+
+    // Default Initial Admin Whitelist
+    const DEFAULT_ADMIN_EMAILS = ['admin@school.edu.tw'];
+
+    // DOM References
+    const adminModal = document.getElementById('admin-modal');
+    const registerModal = document.getElementById('register-modal');
+    const loginTabAdmin = document.getElementById('login-tab-admin');
+    const loginTabGuest = document.getElementById('login-tab-guest');
+    const panelAdmin = document.getElementById('panel-admin');
+    const panelGuest = document.getElementById('panel-guest');
+
+    // UI Toast Notification
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('custom-toast');
+      const icon = document.getElementById('toast-icon');
+      const msgEl = document.getElementById('toast-message');
+      
+      msgEl.textContent = msg;
+      toast.className = `fixed top-5 right-5 px-6 py-3 rounded-xl shadow-lg text-white font-medium transition-all duration-300 flex items-center gap-3 z-50 ${isError ? 'bg-red-500' : 'bg-emerald-500'}`;
+      icon.className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check';
+      
+      toast.style.display = 'flex';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    // Modal & Login Tab Switchers Event Listeners
+    if (loginTabAdmin && loginTabGuest) {
+      loginTabAdmin.addEventListener('click', () => {
+        loginTabAdmin.className = "flex-1 py-2.5 text-center text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
+        loginTabGuest.className = "flex-1 py-2.5 text-center text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+        panelAdmin.classList.remove('hidden');
+        panelGuest.classList.add('hidden');
+      });
+
+      loginTabGuest.addEventListener('click', () => {
+        loginTabGuest.className = "flex-1 py-2.5 text-center text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
+        loginTabAdmin.className = "flex-1 py-2.5 text-center text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+        panelGuest.classList.remove('hidden');
+        panelAdmin.classList.add('hidden');
+      });
+    }
+
+    // Modal Trigger Buttons Wiring
+    const btnOpenRegAdmin = document.getElementById('btn-open-register-admin');
+    const btnOpenRegGuest = document.getElementById('btn-open-register-guest');
+    const btnCloseRegModal = document.getElementById('btn-close-register-modal');
+    const btnSwitchToAdmin = document.getElementById('btn-switch-to-admin');
+    const btnCloseAdminModal = document.getElementById('btn-close-admin-modal');
+
+    if (btnOpenRegAdmin) btnOpenRegAdmin.addEventListener('click', () => registerModal?.classList.remove('hidden'));
+    if (btnOpenRegGuest) btnOpenRegGuest.addEventListener('click', () => registerModal?.classList.remove('hidden'));
+    if (btnCloseRegModal) btnCloseRegModal.addEventListener('click', () => registerModal?.classList.add('hidden'));
+    if (btnSwitchToAdmin) btnSwitchToAdmin.addEventListener('click', () => adminModal?.classList.remove('hidden'));
+    if (btnCloseAdminModal) btnCloseAdminModal.addEventListener('click', () => adminModal?.classList.add('hidden'));
+
+    // Window Click Outside to Close Modals
+    window.addEventListener('click', (e) => {
+      if (e.target === adminModal) adminModal.classList.add('hidden');
+      if (e.target === registerModal) registerModal.classList.add('hidden');
+    });
+
+    // File Upload Helper (with Base64 Fallback if Storage blocked)
+    async function uploadFile(inputId, folder) {
+      const fileInput = document.getElementById(inputId);
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) return null;
+      const file = fileInput.files[0];
+      
+      try {
+        const storageRef = ref(storage, `${folder}/${Date.now()}_${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        return await getDownloadURL(snapshot.ref);
+      } catch (err) {
+        console.warn("Storage upload notice (using DataURL fallback):", err);
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = () => resolve('https://placehold.co/600x400/6366f1/ffffff?text=Image+Upload');
+          reader.readAsDataURL(file);
+        });
+      }
+    }
+
+    // Check Role Logic
+    function checkIsUserAdmin(user) {
+      if (!user || user.isAnonymous || !user.email) return false;
+      const userEmail = user.email.toLowerCase().trim();
+      const isRoleFound = appData.adminRoles.some(r => r.email && r.email.toLowerCase().trim() === userEmail);
+      const isDefaultAdmin = DEFAULT_ADMIN_EMAILS.some(e => e.toLowerCase().trim() === userEmail);
+      return isRoleFound || isDefaultAdmin;
+    }
+
+    function applyRolePermissions(isAdmin) {
+      isCurrentAdmin = isAdmin;
+      const roleBadge = document.getElementById('role-badge');
+      const btnSwitchAdmin = document.getElementById('btn-switch-to-admin');
+      const navAdminManage = document.getElementById('nav-tab-admin-manage');
+
+      if (isAdmin) {
+        roleBadge.className = "inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
+        roleBadge.innerHTML = `<i class="fa-solid fa-shield-check mr-1"></i> 系統管理員 (全權限)`;
+        btnSwitchAdmin.classList.add('hidden');
+        if (navAdminManage) navAdminManage.classList.remove('hidden');
+        
+        document.querySelectorAll('form input, form select, form textarea, .btn-admin-submit').forEach(el => el.disabled = false);
+        document.querySelectorAll('.admin-only-card').forEach(el => el.classList.remove('opacity-60'));
+      } else {
+        roleBadge.className = "inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300";
+        roleBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> 評鑑委員 (唯讀檢視)`;
+        btnSwitchAdmin.classList.remove('hidden');
+        if (navAdminManage) navAdminManage.classList.add('hidden');
+
+        document.querySelectorAll('form input, form select, form textarea, .btn-admin-submit').forEach(el => el.disabled = true);
+        document.querySelectorAll('.admin-only-card').forEach(el => el.classList.add('opacity-60'));
+        
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab && activeTab.id === 'tab-admin-manage') {
+          switchTab('tab-students');
+        }
+      }
+    }
+
+    function switchTab(targetId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => {
+        el.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm', 'active');
+        el.classList.add('text-slate-600', 'hover:bg-slate-100');
+      });
+      document.getElementById(targetId)?.classList.add('active');
+      const activeBtn = document.querySelector(`.nav-tab[data-target="${targetId}"]`);
+      if(activeBtn) {
+        activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm', 'active');
+      }
+    }
+
+    document.querySelectorAll('.nav-tab').forEach(btn => {
+      btn.addEventListener('click', (e) => switchTab(e.currentTarget.dataset.target));
+    });
+
+    // Registration Form Handler
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('register-email').value;
+      const pwd = document.getElementById('register-password').value;
+      const confirmPwd = document.getElementById('register-password-confirm').value;
+
+      if (pwd !== confirmPwd) {
+        return showToast("密碼與確認密碼不符合！", true);
+      }
+
+      const btn = document.getElementById('btn-submit-register');
+      btn.disabled = true; btn.textContent = "建立帳號中...";
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, pwd);
+        registerModal.classList.add('hidden');
+        showToast("帳號註冊成功！已自動登入");
+        e.target.reset();
+      } catch (err) {
+        let errorMsg = err.message;
+        if (err.code === 'auth/email-already-in-use') errorMsg = "此 Email 已存在，請直接登入。";
+        if (err.code === 'auth/weak-password') errorMsg = "密碼長度不足，需至少 6 個字元。";
+        showToast("註冊失敗：" + errorMsg, true);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-user-check mr-1.5"></i> 完成註冊並自動登入`;
+      }
+    });
+
+    // Authentication Actions
+    // 1. Admin Email Login
+    document.getElementById('email-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-email-login');
+      btn.disabled = true; btn.textContent = "驗證中...";
+      try {
+        await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
+        showToast("登入成功！");
+      } catch (err) { 
+        let errorMsg = err.message;
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+          errorMsg = "帳號不存在或密碼錯誤。若尚未建立帳號，請先點擊下方「註冊新管理員帳號」。";
+        }
+        showToast("登入失敗：" + errorMsg, true); 
+      }
+      finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-right-to-bracket mr-2"></i> 管理員 Email 登入`; }
+    });
+
+    // 2. Admin Modal Quick Login
+    document.getElementById('modal-admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-modal-email-login');
+      btn.disabled = true; btn.textContent = "驗證中...";
+      try {
+        await signInWithEmailAndPassword(auth, document.getElementById('modal-login-email').value, document.getElementById('modal-login-password').value);
+        adminModal.classList.add('hidden');
+        showToast("管理員權限解鎖成功！");
+      } catch (err) { 
+        let errorMsg = err.message;
+        if (err.code === 'auth/invalid-credential') errorMsg = "帳號尚未註冊或密碼錯誤。";
+        showToast("驗證失敗：" + errorMsg, true); 
+      }
+      finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-key mr-1.5"></i> 管理員登入`; }
+    });
+
+    // 3. Guest Email Login
+    document.getElementById('guest-email-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-guest-email-login');
+      btn.disabled = true; btn.textContent = "驗證中...";
+      try {
+        await signInWithEmailAndPassword(auth, document.getElementById('guest-login-email').value, document.getElementById('guest-login-password').value);
+        showToast("訪客登入成功");
+      } catch (err) {
+        let errorMsg = err.message;
+        if (err.code === 'auth/invalid-credential') errorMsg = "帳號尚未註冊，請點擊下方「註冊新訪客帳號」。";
+        showToast("登入失敗：" + errorMsg, true);
+      }
+      finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-right-to-bracket mr-2"></i> 訪客 Email 登入`; }
+    });
+
+    // Google Login Handler
+    const handleGoogleLogin = async () => {
+      try {
+        await signInWithPopup(auth, googleProvider);
+        adminModal.classList.add('hidden');
+        showToast("Google 帳號登入成功");
+      } catch (err) { 
+        showToast("Google 登入失敗：" + err.message, true); 
+      }
+    };
+
+    document.getElementById('btn-google-login').addEventListener('click', handleGoogleLogin);
+    document.getElementById('btn-modal-google-login').addEventListener('click', handleGoogleLogin);
+    document.getElementById('btn-guest-google-login').addEventListener('click', handleGoogleLogin);
+
+    // 4. Anonymous Guest Login
+    document.getElementById('btn-anon-login').addEventListener('click', async () => {
+      try {
+        await signInAnonymously(auth);
+        showToast("已以評鑑委員/訪客模式登入");
+      } catch (err) { 
+        showToast("匿名登入失敗：" + err.message, true); 
+      }
+    });
+
+    document.getElementById('btn-logout').addEventListener('click', () => {
+      signOut(auth).then(() => { showToast("已安全登出"); }).catch(err => showToast(err.message, true));
+    });
+
+    // Auth State Changed Observer
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-container').classList.remove('hidden');
+        
+        let displayName = user.displayName || user.email || "評鑑委員 (訪客)";
+        document.getElementById('user-display').textContent = displayName;
+        
+        setupDataListeners(user);
+      } else {
+        document.getElementById('login-screen').classList.remove('hidden');
+        document.getElementById('app-container').classList.add('hidden');
+        unsubscribes.forEach(unsub => unsub());
+        unsubscribes = [];
+      }
+    });
+
+    // Admin Email Management Form
+    document.getElementById('form-add-admin-email').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!isCurrentAdmin) return showToast("權限不足：僅有現有管理員可新增授權", true);
+      const emailInput = document.getElementById('input-new-admin-email');
+      const emailToAdd = emailInput.value.trim().toLowerCase();
+      
+      if (!emailToAdd) return;
+      
+      const btn = document.getElementById('btn-add-admin-email');
+      btn.disabled = true; btn.textContent = "寫入中...";
+
+      try {
+        await addDoc(collection(db, getPath('admin_roles')), {
+          email: emailToAdd,
+          addedBy: auth.currentUser?.email || 'System',
+          timestamp: Date.now()
+        });
+        showToast(`已成功新增管理員授權：${emailToAdd}`);
+        emailInput.value = '';
+      } catch (err) {
+        showToast("新增管理員失敗：" + err.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-plus"></i> 新增授權 Email`;
+      }
+    });
+
+    // Global Delete Admin Handler
+    window.deleteAdminRole = async (docId, email) => {
+      if(!isCurrentAdmin) return showToast("權限不足", true);
+      if (email.toLowerCase() === auth.currentUser?.email?.toLowerCase()) {
+        return showToast("無法移除自己的管理員權限", true);
+      }
+      try {
+        await deleteDoc(doc(db, getPath('admin_roles'), docId));
+        showToast(`已移除管理員授權：${email}`);
+      } catch (err) {
+        showToast("移除失敗：" + err.message, true);
+      }
+    };
+
+    // Data Listeners & Dynamic Rendering
+    function setupDataListeners(currentUser) {
+      const getLocalData = (key, defaultData) => {
+        try {
+          const saved = localStorage.getItem('tssh01_fallback_' + key);
+          return saved ? JSON.parse(saved) : defaultData;
+        } catch(e) { return defaultData; }
+      };
+      const saveLocalData = (key, data) => {
+        try { localStorage.setItem('tssh01_fallback_' + key, JSON.stringify(data)); } catch(e){}
+      };
+
+      const defaultData = {
+        students: [
+          { name: '張哲銘', sportCategory: '羽球', height: '175', weight: '65', juniorHighSchool: '西門國中', standingLongJump: '245', sitAndReach: '38', runDistance: '1600m / 340秒' },
+          { name: '林庭羽', sportCategory: '田徑', height: '168', weight: '54', juniorHighSchool: '中正國中', standingLongJump: '220', sitAndReach: '42', runDistance: '800m / 150秒' }
+        ],
+        schedules: [
+          { academicYear: '113', grade: '一年級 (701)', semester: '上學期', notes: '每週一三五晨練專項', imageUrl: 'https://placehold.co/600x400/4f46e5/ffffff?text=701+Schedule' }
+        ],
+        competitions: [
+          { eventName: '113年全國中等學校運動會', ranking: '第一名 (金牌)', category: '高中男子組羽球單打', studentName: '張哲銘', eventDate: '2024-04-20', proofUrl: 'https://placehold.co/400x300/f59e0b/ffffff?text=Gold+Medal' }
+        ],
+        advocacy: [
+          { type: 'anti_drug', title: '113學年度校園反毒宣導講座', date: '2024-09-15', summary: '邀請專員進行新興毒品辨識與防禦宣導。', photoUrl: 'https://placehold.co/400x300/10b981/ffffff?text=Anti-Drug' }
+        ],
+        adminRoles: [
+          { id: 'seed_1', email: 'admin@school.edu.tw', addedBy: '系統初始設定', timestamp: Date.now() }
+        ]
+      };
+
+      const renderAdminRoles = (roles) => {
+        appData.adminRoles = roles;
+        const tbody = document.getElementById('list-admin-emails');
+        if (!tbody) return;
+
+        const isAdmin = checkIsUserAdmin(currentUser);
+        applyRolePermissions(isAdmin);
+
+        const allAdmins = [...DEFAULT_ADMIN_EMAILS.map(e => ({ email: e, addedBy: '系統核心預設', isSystemDefault: true })), ...roles];
+
+        tbody.innerHTML = allAdmins.map(r => `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 font-semibold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-user-check text-indigo-500"></i> ${r.email}
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-500">${r.addedBy || '系統授權'}</td>
+            <td class="px-4 py-3 text-right">
+              ${r.isSystemDefault ? `<span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">核心預設</span>` : 
+              `<button onclick="window.deleteAdminRole('${r.id}', '${r.email}')" class="text-xs text-red-600 hover:bg-red-50 px-2 py-1 rounded transition border border-red-200">
+                <i class="fa-solid fa-trash-can mr-1"></i> 移除
+              </button>`}
+            </td>
+          </tr>
+        `).join('');
+      };
+
+      const renderStudents = (data) => {
+        appData.students = data;
+        const tbody = document.getElementById('list-students');
+        if (!tbody) return;
+        if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-400">目前無學生資料</td></tr>`; return; }
+        tbody.innerHTML = data.map(s => `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 font-semibold text-slate-800">${s.name}</td>
+            <td class="px-4 py-3 text-indigo-600 font-medium">${s.sportCategory}</td>
+            <td class="px-4 py-3">${s.height}cm / ${s.weight}kg</td>
+            <td class="px-4 py-3">${s.juniorHighSchool}</td>
+            <td class="px-4 py-3 text-xs text-slate-500">
+              跳遠:${s.standingLongJump||'-'} | 體前彎:${s.sitAndReach||'-'} | 跑:${s.runDistance||'-'}
+            </td>
+          </tr>
+        `).join('');
+      };
+
+      const renderSchedules = (data) => {
+        appData.schedules = data;
+        const grid = document.getElementById('list-schedules');
+        if (!grid) return;
+        if (data.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-4 text-slate-400">目前無課表資料</div>`; return; }
+        grid.innerHTML = data.map(s => `
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+            <img src="${s.imageUrl}" class="w-full h-40 object-cover bg-slate-100" alt="Schedule" onerror="this.src='https://placehold.co/600x400/6366f1/ffffff?text=Schedule'">
+            <div class="p-4">
+              <h3 class="font-bold text-slate-800">${s.academicYear}學年度 - ${s.grade}</h3>
+              <p class="text-sm text-indigo-600 font-medium mb-2">${s.semester}</p>
+              <p class="text-xs text-slate-500 line-clamp-2">${s.notes || '無備註'}</p>
+            </div>
+          </div>
+        `).join('');
+      };
+
+      const renderCompetitions = (data) => {
+        appData.competitions = data;
+        const list = document.getElementById('list-competitions');
+        if (!list) return;
+        if (data.length === 0) { list.innerHTML = `<li class="text-center py-6 text-slate-400">目前無比賽紀錄</li>`; return; }
+        list.innerHTML = data.map(c => `
+          <li class="p-4 hover:bg-slate-50 flex gap-4 items-center">
+            ${c.proofUrl ? `<img src="${c.proofUrl}" class="w-16 h-16 rounded object-cover border border-slate-200" onerror="this.src='https://placehold.co/200x200/f59e0b/ffffff?text=Award'">` : `<div class="w-16 h-16 bg-slate-100 rounded flex items-center justify-center text-slate-300"><i class="fa-solid fa-image"></i></div>`}
+            <div class="flex-grow">
+              <h3 class="font-bold text-slate-800">${c.eventName} <span class="ml-2 text-xs font-normal text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">${c.ranking}</span></h3>
+              <p class="text-sm text-slate-600 mt-1">參賽項目：${c.category} | 選手：<span class="font-semibold">${c.studentName}</span></p>
+              <p class="text-xs text-slate-400 mt-1"><i class="fa-regular fa-calendar mr-1"></i>${c.eventDate}</p>
+            </div>
+          </li>
+        `).join('');
+      };
+
+      const typeMap = { 'anti_drug': '反毒宣導', 'anti_bullying': '反霸凌宣導', 'gender_equity': '性別平等' };
+      const renderAdvocacy = (data) => {
+        appData.advocacy = data;
+        const grid = document.getElementById('list-advocacy');
+        if (!grid) return;
+        if (data.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-4 text-slate-400">目前無宣導紀錄</div>`; return; }
+        grid.innerHTML = data.map(a => `
+          <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex gap-4">
+            <img src="${a.photoUrl}" class="w-1/3 object-cover bg-slate-100" alt="Advocacy" onerror="this.src='https://placehold.co/400x300/10b981/ffffff?text=Report'">
+            <div class="p-4 w-2/3 flex flex-col justify-center">
+              <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-1 rounded w-max mb-2">${typeMap[a.type] || a.type}</span>
+              <h3 class="font-bold text-slate-800 text-sm mb-1">${a.title}</h3>
+              <p class="text-xs text-slate-500 mb-2"><i class="fa-regular fa-calendar mr-1"></i>${a.date}</p>
+              <p class="text-xs text-slate-600 line-clamp-2">${a.summary}</p>
+            </div>
+          </div>
+        `).join('');
+      };
+
+      let permWarned = false;
+      const handleFsError = (type, err, defaultVal) => {
+        if (!permWarned) {
+          console.warn(`Firestore [${type}] fallback mode activated.`);
+          permWarned = true;
+        }
+        const local = getLocalData(type, defaultVal);
+        if (type === 'adminRoles') renderAdminRoles(local);
+        if (type === 'students') renderStudents(local);
+        if (type === 'schedules') renderSchedules(local);
+        if (type === 'competitions') renderCompetitions(local);
+        if (type === 'advocacy') renderAdvocacy(local);
+      };
+
+      // Admin Roles Listener
+      unsubscribes.push(onSnapshot(collection(db, getPath('admin_roles')), (snapshot) => {
+        const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        saveLocalData('adminRoles', data);
+        renderAdminRoles(data);
+      }, (e) => handleFsError('adminRoles', e, defaultData.adminRoles)));
+
+      // Students Listener
+      unsubscribes.push(onSnapshot(collection(db, getPath('students')), (snapshot) => {
+        const data = snapshot.docs.map(d => d.data());
+        saveLocalData('students', data);
+        renderStudents(data);
+      }, (e) => handleFsError('students', e, defaultData.students)));
+
+      // Schedules Listener
+      unsubscribes.push(onSnapshot(collection(db, getPath('schedules')), (snapshot) => {
+        const data = snapshot.docs.map(d => d.data());
+        saveLocalData('schedules', data);
+        renderSchedules(data);
+      }, (e) => handleFsError('schedules', e, defaultData.schedules)));
+
+      // Competitions Listener
+      unsubscribes.push(onSnapshot(collection(db, getPath('competitions')), (snapshot) => {
+        const data = snapshot.docs.map(d => d.data());
+        saveLocalData('competitions', data);
+        renderCompetitions(data);
+      }, (e) => handleFsError('competitions', e, defaultData.competitions)));
+
+      // Advocacy Listener
+      unsubscribes.push(onSnapshot(collection(db, getPath('advocacy_reports')), (snapshot) => {
+        const data = snapshot.docs.map(d => d.data());
+        saveLocalData('advocacy', data);
+        renderAdvocacy(data);
+      }, (e) => handleFsError('advocacy', e, defaultData.advocacy)));
+    }
+
+    // Form Submissions (With Role Check)
+    document.getElementById('form-student').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能新增學生資料", true);
+      const data = {
+        name: document.getElementById('st-name').value,
+        sportCategory: document.getElementById('st-sport').value,
+        juniorHighSchool: document.getElementById('st-school').value,
+        height: document.getElementById('st-height').value,
+        weight: document.getElementById('st-weight').value,
+        standingLongJump: document.getElementById('st-jump').value,
+        sitAndReach: document.getElementById('st-sit').value,
+        runDistance: document.getElementById('st-run').value,
+        timestamp: Date.now()
+      };
+      try {
+        await addDoc(collection(db, getPath('students')), data);
+        showToast('學生資料已成功新增！');
+        e.target.reset();
+      } catch (err) { showToast('新增失敗: ' + err.message, true); }
+    });
+
+    document.getElementById('form-schedule').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能上傳專項課表", true);
+      const btn = document.getElementById('btn-submit-sc');
+      btn.disabled = true; btn.textContent = "上傳中...";
+      try {
+        const url = await uploadFile('sc-file', 'schedules');
+        if(!url) throw new Error("請選擇圖片檔案");
+        await addDoc(collection(db, getPath('schedules')), {
+          academicYear: document.getElementById('sc-year').value,
+          grade: document.getElementById('sc-grade').value,
+          semester: document.getElementById('sc-semester').value,
+          notes: document.getElementById('sc-notes').value,
+          imageUrl: url,
+          timestamp: Date.now()
+        });
+        showToast('課表已上傳儲存');
+        e.target.reset();
+      } catch (err) { showToast('上傳失敗: ' + err.message, true); }
+      finally { btn.disabled = false; btn.textContent = "上傳並儲存"; }
+    });
+
+    document.getElementById('form-competition').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能登錄賽事紀錄", true);
+      const btn = document.getElementById('btn-submit-cp');
+      btn.disabled = true; btn.textContent = "處理中...";
+      try {
+        let url = await uploadFile('cp-file', 'certs');
+        await addDoc(collection(db, getPath('competitions')), {
+          eventName: document.getElementById('cp-name').value,
+          eventDate: document.getElementById('cp-date').value,
+          category: document.getElementById('cp-category').value,
+          studentName: document.getElementById('cp-student').value,
+          ranking: document.getElementById('cp-ranking').value,
+          proofUrl: url || '',
+          timestamp: Date.now()
+        });
+        showToast('比賽紀錄已新增');
+        e.target.reset();
+      } catch (err) { showToast('新增失敗: ' + err.message, true); }
+      finally { btn.disabled = false; btn.textContent = "新增紀錄"; }
+    });
+
+    document.getElementById('form-advocacy').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能新增宣導紀錄", true);
+      const btn = document.getElementById('btn-submit-ad');
+      btn.disabled = true; btn.textContent = "上傳中...";
+      try {
+        const url = await uploadFile('ad-file', 'advocacy');
+        if(!url) throw new Error("法定宣導必須附佐證照片");
+        await addDoc(collection(db, getPath('advocacy_reports')), {
+          type: document.getElementById('ad-type').value,
+          date: document.getElementById('ad-date').value,
+          title: document.getElementById('ad-title').value,
+          summary: document.getElementById('ad-summary').value,
+          photoUrl: url,
+          timestamp: Date.now()
+        });
+        showToast('宣導紀錄已上傳');
+        e.target.reset();
+      } catch (err) { showToast('上傳失敗: ' + err.message, true); }
+      finally { btn.disabled = false; btn.textContent = "上傳成果"; }
+    });
+
+    // Gemini AI Integration
+    document.getElementById('btn-generate-ai').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-generate-ai');
+      const loading = document.getElementById('ai-loading');
+      const container = document.getElementById('ai-output-container');
+      const inputKey = document.getElementById('gemini-key').value.trim();
+      const apiKey = inputKey || "";
+
+      btn.disabled = true; btn.classList.add('opacity-50');
+      container.classList.add('hidden');
+      loading.classList.remove('hidden');
+
+      const promptText = `
+你是一位教育評鑑專家。請根據以下「體育班資料統計系統」目前的數據庫狀態，撰寫一份專業、結構清晰的「體育班年度自評總結報告」，用於呈交主管機關。請使用 Markdown 格式，並以繁體中文撰寫。包含「基本資料概況」、「專項訓練與賽事表現」、「品格與法定宣導落實」、「未來展望」四個大段落。
+
+目前系統數據：
+- 學生總數：${appData.students.length} 人。專項包含：${[...new Set(appData.students.map(s=>s.sportCategory))].join(', ') || '暫無'}。
+- 本年度獲獎紀錄：共 ${appData.competitions.length} 筆，包含 ${appData.competitions.map(c=>c.eventName + c.ranking).join('、') || '暫無'}。
+- 法定宣導落實：辦理 ${appData.advocacy.length} 場次，涵蓋 ${[...new Set(appData.advocacy.map(a=>a.type))].join(', ') || '暫無'}。
+      `;
+
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+      const payload = { contents: [{ parts: [{ text: promptText }] }] };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if(!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error?.message || "API 請求錯誤");
+        }
+        
+        const result = await response.json();
+        const markdown = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if(markdown) {
+          container.innerHTML = marked.parse(markdown);
+          container.classList.remove('hidden');
+          showToast("AI 報告生成完畢！");
+        } else {
+          throw new Error("無法解析 AI 回應");
+        }
+      } catch (err) {
+        showToast("報告生成失敗：" + err.message, true);
+        container.innerHTML = `<div class="text-red-500 font-bold">生成錯誤</div><p class="text-sm">${err.message}</p><p class="text-xs text-slate-500 mt-2">提示：請確認是否填寫正確的 Gemini API Key，或在 Canvas 環境中留空。</p>`;
+        container.classList.remove('hidden');
+      } finally {
+        loading.classList.add('hidden');
+        btn.disabled = false; btn.classList.remove('opacity-50');
+      }
+    });
+  </script>
+</body>
+</html>

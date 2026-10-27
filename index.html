@@ -130,91 +130,48 @@
         <h2 class="text-2xl font-extrabold text-slate-900">體育班資料統計系統</h2>
         <p class="text-xs text-slate-500 mt-1">雲端一站式評鑑資料彙整平台</p>
       </div>
-      
-      <!-- Login Type Switcher Tabs -->
-      <div class="flex border-b border-slate-200">
-        <button id="login-tab-admin" type="button" class="flex-1 py-2.5 text-center text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition">
-          <i class="fa-solid fa-shield-halved mr-1.5"></i>管理員登入
-        </button>
-        <button id="login-tab-guest" type="button" class="flex-1 py-2.5 text-center text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
-          <i class="fa-solid fa-eye mr-1.5"></i>評鑑委員 / 訪客
-        </button>
-      </div>
 
-      <!-- Panel A: Admin Form -->
-      <div id="panel-admin" class="space-y-5">
-        <form id="email-login-form" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">管理員 Email</label>
-            <input id="login-email" type="email" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="admin@school.edu.tw">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">密碼</label>
-            <input id="login-password" type="password" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
-          </div>
-          <button type="submit" id="btn-email-login" class="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition shadow">
-            <i class="fa-solid fa-right-to-bracket mr-2"></i> 管理員 Email 登入
-          </button>
-        </form>
-
-        <div class="text-center pt-0.5">
-          <button id="btn-open-register-admin" type="button" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline inline-flex items-center gap-1">
-            <i class="fa-solid fa-user-plus"></i> 還沒有帳號？註冊新管理員帳號
-          </button>
-        </div>
-
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-          <div class="relative flex justify-center text-xs"><span class="bg-white px-2 text-slate-400">快速驗證</span></div>
-        </div>
-
-        <button id="btn-google-login" type="button" class="w-full flex justify-center items-center py-2.5 px-4 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition">
-          <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Google 帳號登入 (管理員)
-        </button>
-      </div>
-
-      <!-- Panel B: Guest Panel -->
-      <div id="panel-guest" class="hidden space-y-4 py-2">
+      <!-- 訪客 / 系統登入面板 -->
+      <div id="panel-guest" class="space-y-4 py-2">
         <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-left space-y-1 mb-2">
           <div class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-            <i class="fa-solid fa-circle-info text-indigo-500"></i> 評鑑委員 / 訪客模式
+            <i class="fa-solid fa-circle-info text-indigo-500"></i> 系統登入與訪客模式
           </div>
           <p class="text-xs text-slate-500 leading-relaxed">
-            訪客模式可完整調閱學生常模、課表、獎狀與 AI 評鑑報告，僅限唯讀檢視。
+            系統將根據您的帳號授權自動賦予檢視或管理員編輯權限。
           </p>
         </div>
 
         <!-- Option 1: Guest Email Login Form -->
         <form id="guest-email-login-form" class="space-y-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">訪客 Email</label>
-            <input id="guest-login-email" type="email" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="visitor@school.edu.tw">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Email 信箱</label>
+            <input id="guest-login-email" type="email" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="user@school.edu.tw">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-600 mb-1">密碼</label>
             <input id="guest-login-password" type="password" required class="w-full px-3 py-2 border border-slate-300 text-slate-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
           </div>
-          <button type="submit" id="btn-guest-email-login" class="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-slate-700 hover:bg-slate-800 transition shadow">
-            <i class="fa-solid fa-right-to-bracket mr-2"></i> 訪客 Email 登入
+          <button type="submit" id="btn-guest-email-login" class="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 transition shadow">
+            <i class="fa-solid fa-right-to-bracket mr-2"></i> Email 登入
           </button>
         </form>
 
         <div class="text-center pt-0.5">
           <button id="btn-open-register-guest" type="button" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:underline inline-flex items-center gap-1">
-            <i class="fa-solid fa-user-plus"></i> 還沒有帳號？註冊新訪客帳號
+            <i class="fa-solid fa-user-plus"></i> 還沒有帳號？註冊新帳號
           </button>
         </div>
 
         <div class="relative my-3">
           <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
-          <div class="relative flex justify-center text-xs"><span class="bg-white px-2 text-slate-400">其他訪客登入方式</span></div>
+          <div class="relative flex justify-center text-xs"><span class="bg-white px-2 text-slate-400">其他登入方式</span></div>
         </div>
 
         <!-- Option 2: Guest Google Login Button -->
         <button id="btn-guest-google-login" type="button" class="w-full flex justify-center items-center py-2.5 px-4 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 transition">
           <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Google 帳號登入 (訪客)
+          Google 帳號登入
         </button>
 
         <!-- Option 3: Anonymous Login Button -->
@@ -284,7 +241,7 @@
         <div class="admin-only-card bg-white p-6 rounded-xl shadow-sm border border-slate-200">
           <h2 class="text-lg font-bold text-slate-800 border-b pb-3 mb-4 flex items-center justify-between">
             <span><i class="fa-solid fa-user-plus text-indigo-600 mr-2"></i>新增學生資料</span>
-            <span class="guest-hide text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold"><i class="fa-solid fa-lock-open mr-1"></i>管理員可編輯</span>
+            <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-semibold"><i class="fa-solid fa-pen-to-square mr-1"></i>所有登入者皆可填報</span>
           </h2>
           <form id="form-student" class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div><label class="block text-xs font-semibold text-slate-600 mb-1">姓名</label><input id="st-name" type="text" required class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-indigo-500"></div>
@@ -517,10 +474,6 @@
     // DOM References
     const adminModal = document.getElementById('admin-modal');
     const registerModal = document.getElementById('register-modal');
-    const loginTabAdmin = document.getElementById('login-tab-admin');
-    const loginTabGuest = document.getElementById('login-tab-guest');
-    const panelAdmin = document.getElementById('panel-admin');
-    const panelGuest = document.getElementById('panel-guest');
 
     // UI Toast Notification
     function showToast(msg, isError = false) {
@@ -536,31 +489,12 @@
       setTimeout(() => { toast.style.display = 'none'; }, 3500);
     }
 
-    // Modal & Login Tab Switchers Event Listeners
-    if (loginTabAdmin && loginTabGuest) {
-      loginTabAdmin.addEventListener('click', () => {
-        loginTabAdmin.className = "flex-1 py-2.5 text-center text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
-        loginTabGuest.className = "flex-1 py-2.5 text-center text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
-        panelAdmin.classList.remove('hidden');
-        panelGuest.classList.add('hidden');
-      });
-
-      loginTabGuest.addEventListener('click', () => {
-        loginTabGuest.className = "flex-1 py-2.5 text-center text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 transition";
-        loginTabAdmin.className = "flex-1 py-2.5 text-center text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
-        panelGuest.classList.remove('hidden');
-        panelAdmin.classList.add('hidden');
-      });
-    }
-
     // Modal Trigger Buttons Wiring
-    const btnOpenRegAdmin = document.getElementById('btn-open-register-admin');
     const btnOpenRegGuest = document.getElementById('btn-open-register-guest');
     const btnCloseRegModal = document.getElementById('btn-close-register-modal');
     const btnSwitchToAdmin = document.getElementById('btn-switch-to-admin');
     const btnCloseAdminModal = document.getElementById('btn-close-admin-modal');
 
-    if (btnOpenRegAdmin) btnOpenRegAdmin.addEventListener('click', () => registerModal?.classList.remove('hidden'));
     if (btnOpenRegGuest) btnOpenRegGuest.addEventListener('click', () => registerModal?.classList.remove('hidden'));
     if (btnCloseRegModal) btnCloseRegModal.addEventListener('click', () => registerModal?.classList.add('hidden'));
     if (btnSwitchToAdmin) btnSwitchToAdmin.addEventListener('click', () => adminModal?.classList.remove('hidden'));
@@ -610,26 +544,30 @@
 
       if (isAdmin) {
         roleBadge.className = "inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300";
-        roleBadge.innerHTML = `<i class="fa-solid fa-shield-check mr-1"></i> 系統管理員 (全權限)`;
+        roleBadge.innerHTML = `<i class="fa-solid fa-shield-check mr-1"></i> 系統管理員 (可檢視全校資料)`;
         btnSwitchAdmin.classList.add('hidden');
         if (navAdminManage) navAdminManage.classList.remove('hidden');
-        
-        document.querySelectorAll('form input, form select, form textarea, .btn-admin-submit').forEach(el => el.disabled = false);
-        document.querySelectorAll('.admin-only-card').forEach(el => el.classList.remove('opacity-60'));
       } else {
-        roleBadge.className = "inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300";
-        roleBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> 評鑑委員 (唯讀檢視)`;
+        roleBadge.className = "inline-flex items-center text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-300";
+        roleBadge.innerHTML = `<i class="fa-solid fa-user-pen mr-1"></i> 一般填報權限 (僅顯示個人資料)`;
         btnSwitchAdmin.classList.remove('hidden');
         if (navAdminManage) navAdminManage.classList.add('hidden');
 
-        document.querySelectorAll('form input, form select, form textarea, .btn-admin-submit').forEach(el => el.disabled = true);
-        document.querySelectorAll('.admin-only-card').forEach(el => el.classList.add('opacity-60'));
-        
         const activeTab = document.querySelector('.tab-content.active');
         if (activeTab && activeTab.id === 'tab-admin-manage') {
           switchTab('tab-students');
         }
       }
+
+      // 開放所有登入使用者填報表單
+      document.querySelectorAll('form input, form select, form textarea, .btn-admin-submit').forEach(el => el.disabled = false);
+      document.querySelectorAll('.admin-only-card').forEach(el => el.classList.remove('opacity-60'));
+
+      // 重新觸發列表過濾與渲染
+      if (appData.students) renderStudents(appData.students);
+      if (appData.schedules) renderSchedules(appData.schedules);
+      if (appData.competitions) renderCompetitions(appData.competitions);
+      if (appData.advocacy) renderAdvocacy(appData.advocacy);
     }
 
     function switchTab(targetId) {
@@ -681,73 +619,37 @@
     });
 
     // Authentication Actions
-    // 1. Admin Email Login
-    document.getElementById('email-login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-email-login');
-      btn.disabled = true; btn.textContent = "驗證中...";
-      try {
-        await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-password').value);
-        showToast("登入成功！");
-      } catch (err) { 
-        let errorMsg = err.message;
-        if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
-          errorMsg = "帳號不存在或密碼錯誤。若尚未建立帳號，請先點擊下方「註冊新管理員帳號」。";
-        }
-        showToast("登入失敗：" + errorMsg, true); 
-      }
-      finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-right-to-bracket mr-2"></i> 管理員 Email 登入`; }
-    });
-
-    // 2. Admin Modal Quick Login
-    document.getElementById('modal-admin-login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btn-modal-email-login');
-      btn.disabled = true; btn.textContent = "驗證中...";
-      try {
-        await signInWithEmailAndPassword(auth, document.getElementById('modal-login-email').value, document.getElementById('modal-login-password').value);
-        adminModal.classList.add('hidden');
-        showToast("管理員權限解鎖成功！");
-      } catch (err) { 
-        let errorMsg = err.message;
-        if (err.code === 'auth/invalid-credential') errorMsg = "帳號尚未註冊或密碼錯誤。";
-        showToast("驗證失敗：" + errorMsg, true); 
-      }
-      finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-key mr-1.5"></i> 管理員登入`; }
-    });
-
-    // 3. Guest Email Login
+    // 1. Email Login
     document.getElementById('guest-email-login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-guest-email-login');
       btn.disabled = true; btn.textContent = "驗證中...";
       try {
         await signInWithEmailAndPassword(auth, document.getElementById('guest-login-email').value, document.getElementById('guest-login-password').value);
-        showToast("訪客登入成功");
+        showToast("登入成功！");
       } catch (err) {
         let errorMsg = err.message;
-        if (err.code === 'auth/invalid-credential') errorMsg = "帳號尚未註冊，請點擊下方「註冊新訪客帳號」。";
+        if (err.code === 'auth/invalid-credential') errorMsg = "帳號尚未註冊，請點擊下方「註冊新帳號」。";
         showToast("登入失敗：" + errorMsg, true);
       }
-      finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-right-to-bracket mr-2"></i> 訪客 Email 登入`; }
+      finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-right-to-bracket mr-2"></i> Email 登入`; }
     });
 
     // Google Login Handler
     const handleGoogleLogin = async () => {
       try {
         await signInWithPopup(auth, googleProvider);
-        adminModal.classList.add('hidden');
+        adminModal?.classList.add('hidden');
         showToast("Google 帳號登入成功");
       } catch (err) { 
         showToast("Google 登入失敗：" + err.message, true); 
       }
     };
 
-    document.getElementById('btn-google-login').addEventListener('click', handleGoogleLogin);
-    document.getElementById('btn-modal-google-login').addEventListener('click', handleGoogleLogin);
-    document.getElementById('btn-guest-google-login').addEventListener('click', handleGoogleLogin);
+    document.getElementById('btn-modal-google-login')?.addEventListener('click', handleGoogleLogin);
+    document.getElementById('btn-guest-google-login')?.addEventListener('click', handleGoogleLogin);
 
-    // 4. Anonymous Guest Login
+    // 2. Anonymous Guest Login
     document.getElementById('btn-anon-login').addEventListener('click', async () => {
       try {
         await signInAnonymously(auth);
@@ -845,34 +747,41 @@
           { eventName: '113年全國中等學校運動會', ranking: '第一名 (金牌)', category: '高中男子組羽球單打', studentName: '張哲銘', eventDate: '2024-04-20', proofUrl: 'https://placehold.co/400x300/f59e0b/ffffff?text=Gold+Medal' }
         ],
         advocacy: [
-          { type: 'anti_drug', title: '113學年度校園反毒宣導講座', date: '2024-09-15', summary: '邀請專員進行新興毒品辨識與防禦宣導。', photoUrl: 'https://placehold.co/400x300/10b981/ffffff?text=Anti-Drug' }
-        ],
-        adminRoles: [
-          { id: 'seed_1', email: 'admin@school.edu.tw', addedBy: '系統初始設定', timestamp: Date.now() }
+          { type: 'anti_drug', title: '113年反毒宣導講座', date: '2024-09-15', summary: '邀請少輔會宣導反毒知識與相關法規。', photoUrl: 'https://placehold.co/400x300/10b981/ffffff?text=Advocacy+1' }
         ]
       };
 
-      const renderAdminRoles = (roles) => {
-        appData.adminRoles = roles;
+      // 過濾使用者資料（管理員看全部，一般使用者只看自己填報的）
+      const filterDataForUser = (items) => {
+        if (isCurrentAdmin) return items;
+        const currentEmail = (auth.currentUser?.email || '').toLowerCase().trim();
+        const currentUid = auth.currentUser?.uid;
+        return items.filter(item => {
+          if (!item.createdBy && !item.userId) return true;
+          const isEmailMatch = item.createdBy && item.createdBy.toLowerCase().trim() === currentEmail;
+          const isUidMatch = item.userId && item.userId === currentUid;
+          return isEmailMatch || isUidMatch;
+        });
+      };
+
+      const renderAdminRoles = (data) => {
+        appData.adminRoles = data;
+        if (auth.currentUser) {
+          const isAdmin = checkIsUserAdmin(auth.currentUser);
+          applyRolePermissions(isAdmin);
+        }
         const tbody = document.getElementById('list-admin-emails');
         if (!tbody) return;
-
-        const isAdmin = checkIsUserAdmin(currentUser);
-        applyRolePermissions(isAdmin);
-
-        const allAdmins = [...DEFAULT_ADMIN_EMAILS.map(e => ({ email: e, addedBy: '系統核心預設', isSystemDefault: true })), ...roles];
-
-        tbody.innerHTML = allAdmins.map(r => `
+        if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="3" class="text-center py-4 text-slate-400">目前無自訂管理員</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = data.map(item => `
           <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 font-semibold text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-user-check text-indigo-500"></i> ${r.email}
-            </td>
-            <td class="px-4 py-3 text-xs text-slate-500">${r.addedBy || '系統授權'}</td>
+            <td class="px-4 py-3 font-semibold text-slate-800">${item.email}</td>
+            <td class="px-4 py-3 text-xs text-slate-500">${item.addedBy ? '由 ' + item.addedBy + ' 新增' : '系統預設'}</td>
             <td class="px-4 py-3 text-right">
-              ${r.isSystemDefault ? `<span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded">核心預設</span>` : 
-              `<button onclick="window.deleteAdminRole('${r.id}', '${r.email}')" class="text-xs text-red-600 hover:bg-red-50 px-2 py-1 rounded transition border border-red-200">
-                <i class="fa-solid fa-trash-can mr-1"></i> 移除
-              </button>`}
+              ${item.id ? `<button onclick="deleteAdminRole('${item.id}', '${item.email}')" class="text-xs text-red-600 hover:text-red-800 font-semibold bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded transition"><i class="fa-solid fa-trash mr-1"></i>移除</button>` : '<span class="text-xs text-slate-400">預設管理員</span>'}
             </td>
           </tr>
         `).join('');
@@ -882,10 +791,15 @@
         appData.students = data;
         const tbody = document.getElementById('list-students');
         if (!tbody) return;
-        if (data.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-400">目前無學生資料</td></tr>`; return; }
-        tbody.innerHTML = data.map(s => `
+        
+        const displayData = filterDataForUser(data);
+        if (displayData.length === 0) { 
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-400">${isCurrentAdmin ? '目前無學生資料' : '目前您尚未建立任何學生資料'}</td></tr>`; 
+          return; 
+        }
+        tbody.innerHTML = displayData.map(s => `
           <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3 font-semibold text-slate-800">${s.name}</td>
+            <td class="px-4 py-3 font-semibold text-slate-800">${s.name} ${!isCurrentAdmin ? '<span class="text-[10px] text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded ml-1">您的資料</span>' : ''}</td>
             <td class="px-4 py-3 text-indigo-600 font-medium">${s.sportCategory}</td>
             <td class="px-4 py-3">${s.height}cm / ${s.weight}kg</td>
             <td class="px-4 py-3">${s.juniorHighSchool}</td>
@@ -900,8 +814,13 @@
         appData.schedules = data;
         const grid = document.getElementById('list-schedules');
         if (!grid) return;
-        if (data.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-4 text-slate-400">目前無課表資料</div>`; return; }
-        grid.innerHTML = data.map(s => `
+        
+        const displayData = filterDataForUser(data);
+        if (displayData.length === 0) { 
+          grid.innerHTML = `<div class="col-span-full text-center py-4 text-slate-400">${isCurrentAdmin ? '目前無課表資料' : '目前您尚未上傳任何課表資料'}</div>`; 
+          return; 
+        }
+        grid.innerHTML = displayData.map(s => `
           <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
             <img src="${s.imageUrl}" class="w-full h-40 object-cover bg-slate-100" alt="Schedule" onerror="this.src='https://placehold.co/600x400/6366f1/ffffff?text=Schedule'">
             <div class="p-4">
@@ -917,8 +836,13 @@
         appData.competitions = data;
         const list = document.getElementById('list-competitions');
         if (!list) return;
-        if (data.length === 0) { list.innerHTML = `<li class="text-center py-6 text-slate-400">目前無比賽紀錄</li>`; return; }
-        list.innerHTML = data.map(c => `
+        
+        const displayData = filterDataForUser(data);
+        if (displayData.length === 0) { 
+          list.innerHTML = `<li class="text-center py-6 text-slate-400">${isCurrentAdmin ? '目前無比賽紀錄' : '目前您尚未登錄任何比賽紀錄'}</li>`; 
+          return; 
+        }
+        list.innerHTML = displayData.map(c => `
           <li class="p-4 hover:bg-slate-50 flex gap-4 items-center">
             ${c.proofUrl ? `<img src="${c.proofUrl}" class="w-16 h-16 rounded object-cover border border-slate-200" onerror="this.src='https://placehold.co/200x200/f59e0b/ffffff?text=Award'">` : `<div class="w-16 h-16 bg-slate-100 rounded flex items-center justify-center text-slate-300"><i class="fa-solid fa-image"></i></div>`}
             <div class="flex-grow">
@@ -935,8 +859,13 @@
         appData.advocacy = data;
         const grid = document.getElementById('list-advocacy');
         if (!grid) return;
-        if (data.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-4 text-slate-400">目前無宣導紀錄</div>`; return; }
-        grid.innerHTML = data.map(a => `
+        
+        const displayData = filterDataForUser(data);
+        if (displayData.length === 0) { 
+          grid.innerHTML = `<div class="col-span-full text-center py-4 text-slate-400">${isCurrentAdmin ? '目前無宣導紀錄' : '目前您尚未上傳任何宣導紀錄'}</div>`; 
+          return; 
+        }
+        grid.innerHTML = displayData.map(a => `
           <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex gap-4">
             <img src="${a.photoUrl}" class="w-1/3 object-cover bg-slate-100" alt="Advocacy" onerror="this.src='https://placehold.co/400x300/10b981/ffffff?text=Report'">
             <div class="p-4 w-2/3 flex flex-col justify-center">
@@ -962,6 +891,10 @@
         if (type === 'competitions') renderCompetitions(local);
         if (type === 'advocacy') renderAdvocacy(local);
       };
+
+      // Clean up previous listeners
+      unsubscribes.forEach(unsub => unsub());
+      unsubscribes = [];
 
       // Admin Roles Listener
       unsubscribes.push(onSnapshot(collection(db, getPath('admin_roles')), (snapshot) => {
@@ -999,10 +932,10 @@
       }, (e) => handleFsError('advocacy', e, defaultData.advocacy)));
     }
 
-    // Form Submissions (With Role Check)
+    // Form Submissions
     document.getElementById('form-student').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能新增學生資料", true);
+      const currentUser = auth.currentUser;
       const data = {
         name: document.getElementById('st-name').value,
         sportCategory: document.getElementById('st-sport').value,
@@ -1012,6 +945,8 @@
         standingLongJump: document.getElementById('st-jump').value,
         sitAndReach: document.getElementById('st-sit').value,
         runDistance: document.getElementById('st-run').value,
+        createdBy: currentUser?.email || '訪客/' + (currentUser?.uid || ''),
+        userId: currentUser?.uid || '',
         timestamp: Date.now()
       };
       try {
@@ -1023,7 +958,7 @@
 
     document.getElementById('form-schedule').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能上傳專項課表", true);
+      const currentUser = auth.currentUser;
       const btn = document.getElementById('btn-submit-sc');
       btn.disabled = true; btn.textContent = "上傳中...";
       try {
@@ -1035,6 +970,8 @@
           semester: document.getElementById('sc-semester').value,
           notes: document.getElementById('sc-notes').value,
           imageUrl: url,
+          createdBy: currentUser?.email || '訪客/' + (currentUser?.uid || ''),
+          userId: currentUser?.uid || '',
           timestamp: Date.now()
         });
         showToast('課表已上傳儲存');
@@ -1045,7 +982,7 @@
 
     document.getElementById('form-competition').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能登錄賽事紀錄", true);
+      const currentUser = auth.currentUser;
       const btn = document.getElementById('btn-submit-cp');
       btn.disabled = true; btn.textContent = "處理中...";
       try {
@@ -1057,6 +994,8 @@
           studentName: document.getElementById('cp-student').value,
           ranking: document.getElementById('cp-ranking').value,
           proofUrl: url || '',
+          createdBy: currentUser?.email || '訪客/' + (currentUser?.uid || ''),
+          userId: currentUser?.uid || '',
           timestamp: Date.now()
         });
         showToast('比賽紀錄已新增');
@@ -1067,7 +1006,7 @@
 
     document.getElementById('form-advocacy').addEventListener('submit', async (e) => {
       e.preventDefault();
-      if(!isCurrentAdmin) return showToast("權限受限：只有管理員能新增宣導紀錄", true);
+      const currentUser = auth.currentUser;
       const btn = document.getElementById('btn-submit-ad');
       btn.disabled = true; btn.textContent = "上傳中...";
       try {
@@ -1079,6 +1018,8 @@
           title: document.getElementById('ad-title').value,
           summary: document.getElementById('ad-summary').value,
           photoUrl: url,
+          createdBy: currentUser?.email || '訪客/' + (currentUser?.uid || ''),
+          userId: currentUser?.uid || '',
           timestamp: Date.now()
         });
         showToast('宣導紀錄已上傳');
